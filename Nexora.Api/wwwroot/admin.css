@@ -1,0 +1,164 @@
+.admin-container {
+    display: flex;
+    min-height: 100vh;
+    background: #f5f5f5;
+}
+
+.admin-sidebar {
+    width: 250px;
+    background: linear-gradient(135deg, var(--primary-purple), var(--primary-blue));
+    color: white;
+    padding: 2rem;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.admin-sidebar h2 {
+    margin-bottom: 2rem;
+}
+
+.admin-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.admin-nav-link {
+    color: white;
+    text-decoration: none;
+    padding: 1rem;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.admin-nav-link:hover,
+.admin-nav-link.active {
+    background: rgba(255,255,255,0.2);
+}
+
+.admin-logout {
+    margin-top: 2rem;
+    background: var(--velvet-red);
+    color: white;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.admin-main {
+    margin-left: 250px;
+    flex: 1;
+    padding: 2rem;
+}
+
+.admin-section {
+    display: none;
+}
+
+.admin-section.active {
+    display: block;
+}
+
+.admin-table-container {
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-top: 1rem;
+    overflow-x: auto;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.admin-table th {
+    background: var(--light-purple);
+    font-weight: 600;
+}
+
+.admin-table img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-small {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.btn-delete {
+    background: var(--velvet-red);
+    color: white;
+}
+
+.btn-edit {
+    background: var(--tiffany-blue);
+    color: white;
+}
+
+.content-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.content-tab {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid var(--primary-blue);
+    background: white;
+    color: var(--primary-blue);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.content-tab.active {
+    background: var(--primary-blue);
+    color: white;
+}
+
+.content-editor {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+}
+
+.content-editor .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.content-editor textarea {
+    min-height: 200px;
+}
+
+@media (max-width: 768px) {
+    .admin-sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+    
+    .admin-main {
+        margin-left: 0;
+    }
+}

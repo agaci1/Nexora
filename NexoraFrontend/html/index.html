@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Nexora</title>
+  <link rel="stylesheet" href="/Users/alkeogaci/Documents/Nexora/NexoraFrontend/css/styles.css" />
+</head>
+<body>
+  <header class="navbar">
+    <div class="nav-inner">
+      <div class="brand" data-nav="#home">Nexora</div>
+
+      <nav class="nav-links">
+        <a href="#home" data-link>Home</a>
+        <a href="#about" data-link>About</a>
+        <a href="#shop" data-link>Shop</a>
+        <a href="#cart" data-link>
+          Your Cart
+          <span id="cart-badge" class="badge">0</span>
+        </a>
+        <a href="#contact" data-link>Contact</a>
+        <a href="#privacy" data-link>Privacy Policy</a>
+      </nav>
+
+      <button id="admin-icon" class="icon-btn" aria-label="Admin Login">
+        🔐
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- HOME -->
+    <section id="home-page" class="page">
+      <div class="hero card">
+        <div class="hero-left">
+          <h1 id="home-title">Loading...</h1>
+          <p id="home-subtitle" class="muted">Please wait.</p>
+          <button id="shop-now-btn" class="btn btn-primary">Shop Now</button>
+        </div>
+        <div class="hero-right">
+          <img id="home-image" class="hero-img" src="" alt="Nexora banner" />
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h2>Fast & Simple</h2>
+          <p class="muted">
+            Discover curated fashion and lifestyle products. Add to cart, refresh anytime — your cart stays.
+          </p>
+        </div>
+        <div class="card">
+          <h2>WhatsApp Checkout</h2>
+          <p class="muted">
+            When you confirm, your order details are automatically prepared and opened in WhatsApp for the owner.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about-page" class="page hidden">
+      <div class="card">
+        <h1>About Nexora</h1>
+        <p id="about-text" class="about-text">Loading...</p>
+
+        <div class="about-images">
+          <img id="about-image-1" src="" alt="About image 1" />
+          <img id="about-image-2" src="" alt="About image 2" />
+        </div>
+      </div>
+    </section>
+
+    <!-- SHOP -->
+    <section id="shop-page" class="page hidden">
+      <div class="card">
+        <div class="shop-top">
+          <h1>Shop</h1>
+          <div class="filters">
+            <div class="filter-block">
+              <span class="label">Gender</span>
+              <div class="segmented">
+                <button class="seg-btn" id="gender-male">Male</button>
+                <button class="seg-btn" id="gender-female">Female</button>
+              </div>
+            </div>
+            <div class="filter-block">
+              <span class="label">Category</span>
+              <div id="category-pills" class="pills muted">
+                Select a gender to see categories.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="products-grid" class="products-grid"></div>
+
+        <div id="shop-empty" class="empty hidden">
+          No products found for the selected filters.
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUCT DETAILS -->
+    <section id="product-details-page" class="page hidden">
+      <div class="card">
+        <button id="back-to-shop" class="btn btn-secondary">← Back to Shop</button>
+
+        <div class="product-details">
+          <div class="carousel">
+            <button id="carousel-prev" class="carousel-btn" aria-label="Previous image">‹</button>
+            <img id="product-image" class="product-img" src="" alt="Product image" />
+            <button id="carousel-next" class="carousel-btn" aria-label="Next image">›</button>
+          </div>
+
+          <div class="product-info">
+            <h1 id="product-name">Loading...</h1>
+            <p id="product-price" class="price">—</p>
+            <div class="desc-box">
+              <h3>Description</h3>
+              <p id="product-description" class="desc"></p>
+            </div>
+
+            <button id="add-to-cart-btn" class="btn btn-primary">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CART -->
+    <section id="cart-page" class="page hidden">
+      <div class="card">
+        <h1>Your Cart</h1>
+
+        <div id="cart-list" class="cart-list"></div>
+
+        <div id="cart-empty" class="empty hidden">
+          Your cart is empty.
+        </div>
+
+        <div class="cart-summary">
+          <div class="summary-row">
+            <span>Total</span>
+            <strong id="cart-total">€0.00</strong>
+          </div>
+          <button id="checkout-btn" class="btn btn-primary">Checkout</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact-page" class="page hidden">
+      <div class="card">
+        <h1>Contact</h1>
+        <p class="muted">Reach us anytime.</p>
+
+        <div class="contact-grid">
+          <div class="contact-item">
+            <h3>Email</h3>
+            <a id="contact-email" href="mailto:info@nexora.com">info@nexora.com</a>
+          </div>
+          <div class="contact-item">
+            <h3>Phone</h3>
+            <a id="contact-phone" href="tel:+355690000000">+355 69 000 0000</a>
+          </div>
+          <div class="contact-item">
+            <h3>Business Hours</h3>
+            <p class="muted">Mon–Sat: 09:00–20:00</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRIVACY -->
+    <section id="privacy-page" class="page hidden">
+      <div class="card">
+        <h1>Privacy Policy</h1>
+        <p class="muted">Last updated: <span id="privacy-updated">—</span></p>
+
+        <div class="policy">
+          <p>
+            Nexora respects your privacy. We collect only the information required to process orders.
+          </p>
+          <ul>
+            <li>We do not create user accounts.</li>
+            <li>Checkout information is used only for order fulfillment.</li>
+            <li>Orders are confirmed via WhatsApp.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ADMIN CONFIRM MODAL -->
+  <div id="admin-confirm-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h2>Administrators Only</h2>
+      <p class="muted">This option is for Administrators only. Are you an Admin?</p>
+      <div class="modal-actions">
+        <button id="admin-no-btn" class="btn btn-danger">No</button>
+        <button id="admin-yes-btn" class="btn btn-accept">Yes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN LOGIN MODAL -->
+  <div id="admin-login-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h2>Admin Login</h2>
+      <p class="muted">Enter your credentials.</p>
+
+      <div class="form">
+        <label>Username</label>
+        <input id="admin-username" type="text" placeholder="admin" />
+
+        <label>Password</label>
+        <input id="admin-password" type="password" placeholder="••••••••" />
+
+        <div class="modal-actions">
+          <button id="admin-login-cancel" class="btn btn-danger">Cancel</button>
+          <button id="admin-login-submit" class="btn btn-accept">Login</button>
+        </div>
+
+        <p id="admin-login-error" class="error hidden"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKOUT MODAL -->
+  <div id="checkout-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card modal-wide">
+      <h2>Checkout</h2>
+      <p class="muted">All fields are mandatory except Notes.</p>
+
+      <form id="checkout-form" class="form">
+        <div class="grid-2">
+          <div>
+            <label>Name Surname</label>
+            <input name="fullName" type="text" required />
+          </div>
+          <div>
+            <label>Email</label>
+            <input name="email" type="email" required />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label>Contact number</label>
+            <input name="phone" type="tel" required />
+          </div>
+          <div>
+            <label>Country</label>
+            <input name="country" list="country-options" required />
+            <datalist id="country-options">
+              <option value="Albania"></option>
+              <option value="Greece"></option>
+              <option value="Kosovo"></option>
+              <option value="North Macedonia"></option>
+            </datalist>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label>State/Province</label>
+            <input name="state" list="state-options" required />
+            <datalist id="state-options"></datalist>
+          </div>
+          <div>
+            <label>City</label>
+            <input name="city" type="text" required />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label>Post Code</label>
+            <input name="postCode" type="text" required />
+          </div>
+          <div>
+            <label>Notes (optional)</label>
+            <input name="notes" type="text" />
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="checkout-cancel" class="btn btn-danger">Cancel</button>
+          <button type="submit" id="confirm-order" class="btn btn-accept">Confirm order</button>
+        </div>
+
+        <p id="checkout-error" class="error hidden"></p>
+      </form>
+    </div>
+  </div>
+
+  <script src="/Users/alkeogaci/Documents/Nexora/NexoraFrontend/js/app.js"></script>
+</body>
+</html>
