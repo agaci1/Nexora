@@ -1,9 +1,11 @@
 using System.Text;
+using BCrypt.Net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Nexora.Api.Data;
+using Nexora.Api.Models;
 using Nexora.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,7 +18,6 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Nexora API", Version = "v1" });
 
-    // JWT Bearer in Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -43,7 +44,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// ---------- CORS (adjust origin later if needed) ----------
+// ---------- CORS (dev-friendly; tighten later) ----------
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -53,21 +54,23 @@ builder.Services.AddCors(options =>
 });
 
 // ---------- DB (Railway MySQL) ----------
-var conn = builder.Configuration.GetConnectionString("DefaultConnection");
+var conn =
+    builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
+    ?? Environment.GetEnvironmentVariable("MYSQL_URL")
+    ?? Environment.GetEnvironmentVariable("MYSQL_PUBLIC_URL");
 
-// Railway usually provides one of these:
-conn ??= Environment.GetEnvironmentVariable("mysql://root:fIOAtEIYASmQDbtDdLqpExANOrgWcDEn@mysql.railway.internal:3306/railway");
-conn ??= Environment.GetEnvironmentVariable("mysql://root:fIOAtEIYASmQDbtDdLqpExANOrgWcDEn@shinkansen.proxy.rlwy.net:36613/railway");
-
-// If it's mysql://... convert to MySQL connection string
-if (!string.IsNullOrWhiteSpace(conn) && conn.StartsWith("mysql://", StringComparison.OrdinalIgnoreCase))
+if (!string.IsNullOrWhiteSpace(conn) &&
+    conn.StartsWith("mysql://", StringComparison.OrdinalIgnoreCase))
 {
     conn = ConnectionStringHelper.FromMySqlUrl(conn);
 }
 
 if (string.IsNullOrWhiteSpace(conn))
 {
-    throw new Exception("Database connection string not found. Set ConnectionStrings:DefaultConnection or MYSQL_URL / MYSQL_PUBLIC_URL.");
+    throw new Exception(
+        "Database connection string not found. " +
+        "Set ConnectionStrings:DefaultConnection, or env var ConnectionStrings__DefaultConnection / MYSQL_URL / MYSQL_PUBLIC_URL.");
 }
 
 builder.Services.AddDbContext<NexoraDbContext>(opt =>
@@ -81,7 +84,7 @@ var jwtSecret =
 
 if (string.IsNullOrWhiteSpace(jwtSecret))
 {
-    // Don't ship like this; only to prevent crash during dev if you forgot env vars.
+    // Dev-only fallback to avoid crash.
     jwtSecret = "CHANGE_ME_CHANGE_ME_CHANGE_ME_MIN_32_CHARS";
 }
 
@@ -123,17 +126,47 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// (Optional) Migrations/Seed:
-// If your Program.cs auto-migrates & seeds, keep it, BUT it will crash if DB env vars are wrong.
-// Make sure the connection string points to Railway before running.
+
+// ---------- Auto-migrate + Seed Admin ----------
 try
 {
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<NexoraDbContext>();
-    db.Database.Migrate();
 
-    // If you have SeedData:
-    // await SeedData.InitializeAsync(db, scope.ServiceProvider.GetRequiredService<IConfiguration>());
+    // 1) Run migrations
+    await db.Database.MigrateAsync();
+
+    // 2) Seed admin from config/env (Railway: Admin__Username / Admin__Password)
+    var adminUsername =
+        builder.Configuration["Admin:Username"]
+        ?? Environment.GetEnvironmentVariable("Admin__Username");
+
+    var adminPassword =
+        builder.Configuration["Admin:Password"]
+        ?? Environment.GetEnvironmentVariable("Admin__Password");
+
+    if (!string.IsNullOrWhiteSpace(adminUsername) && !string.IsNullOrWhiteSpace(adminPassword))
+    {
+        var exists = await db.AdminUsers.AnyAsync(a => a.Username == adminUsername);
+
+        if (!exists)
+        {
+            db.AdminUsers.Add(new AdminUser
+            {
+                Username = adminUsername,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(adminPassword),
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await db.SaveChangesAsync();
+
+            app.Logger.LogInformation("Seeded initial admin user: {Username}", adminUsername);
+        }
+    }
+    else
+    {
+        app.Logger.LogWarning("Admin seed skipped: Admin__Username/Admin__Password not set.");
+    }
 }
 catch (Exception ex)
 {
@@ -159,7 +192,7 @@ static class ConnectionStringHelper
         var port = uri.Port;
         var db = uri.AbsolutePath.Trim('/');
 
-        // Railway often needs SSL. If your Railway URL works without it, you can remove SslMode.
+        // Railway often needs SSL; keep Required unless you confirm otherwise.
         return $"Server={host};Port={port};Database={db};User={user};Password={pass};SslMode=Required;";
     }
 }
