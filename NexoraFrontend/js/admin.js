@@ -1,6 +1,6 @@
 (() => {
     const CONFIG = {
-      API_BASE: "", // keep "" if same domain. If different, set: "https://your-api-domain"
+      API_BASE: "http://localhost:5000",
       TOKEN_KEY: "nexora_admin_token_v1",
       CATEGORIES: [
         "T-Shirts",
@@ -99,19 +99,19 @@
   
     function openTab(name) {
       Object.values(tabs).forEach(t => t.classList.add("hidden"));
-      tabs[name].classList.remove("hidden");
+      tabs[name]?.classList.remove("hidden");
       sideLinks.forEach(b => b.classList.toggle("active", b.dataset.tab === name));
       tabTitle.textContent = name.charAt(0).toUpperCase() + name.slice(1);
     }
   
     sideLinks.forEach(btn => btn.addEventListener("click", () => openTab(btn.dataset.tab)));
   
-    document.getElementById("logout").addEventListener("click", () => {
+    document.getElementById("logout")?.addEventListener("click", () => {
       localStorage.removeItem(CONFIG.TOKEN_KEY);
       window.location.href = "/html/index.html#home";
     });
   
-    document.getElementById("refresh").addEventListener("click", () => refreshAll());
+    document.getElementById("refresh")?.addEventListener("click", () => refreshAll());
   
     // ===== Products =====
     const productsTbody = document.getElementById("products-tbody");
@@ -163,13 +163,14 @@
       pPhotos.value = "";
     }
   
-    openAddProductBtn.addEventListener("click", () => {
+    openAddProductBtn?.addEventListener("click", () => {
       fillCategoryOptions();
       resetAddForm();
       showModal();
     });
-    addCancel.addEventListener("click", hideModal);
-    addModal.addEventListener("click", (e) => { if (e.target === addModal) hideModal(); });
+  
+    addCancel?.addEventListener("click", hideModal);
+    addModal?.addEventListener("click", (e) => { if (e.target === addModal) hideModal(); });
   
     async function loadProducts() {
       const products = await apiGet("/api/admin/products?page=1&pageSize=200");
@@ -185,17 +186,17 @@
         const img = document.createElement("img");
         img.className = "timg";
         img.src = (p.imageUrls && p.imageUrls.length) ? p.imageUrls[0] : "";
-        img.alt = p.name;
+        img.alt = p.name || "Product";
         imgTd.appendChild(img);
   
         const nameTd = document.createElement("td");
-        nameTd.textContent = p.name;
+        nameTd.textContent = p.name || "";
   
         const gTd = document.createElement("td");
-        gTd.textContent = p.genderType;
+        gTd.textContent = p.genderType || "";
   
         const cTd = document.createElement("td");
-        cTd.textContent = p.category;
+        cTd.textContent = p.category || "";
   
         const priceTd = document.createElement("td");
         priceTd.textContent = Number(p.price || 0).toFixed(2);
@@ -218,8 +219,6 @@
   
     // ===== Image upload via cloudinary-service =====
     async function getCloudinaryServiceUrl() {
-      // You already have ConfigController
-      // GET /api/config/cloudinary-service -> returns URL string
       const res = await fetch(apiUrl("/api/config/cloudinary-service"));
       if (!res.ok) throw new Error("Failed to load cloudinary-service url");
       const url = await res.json();
@@ -228,8 +227,6 @@
     }
   
     async function uploadFilesToCloudinaryService(files) {
-      // Expected: POST {serviceUrl}/upload with multipart files
-      // Returns: { urls: ["https://...","https://..."] }
       const serviceUrl = await getCloudinaryServiceUrl();
   
       const fd = new FormData();
@@ -253,7 +250,7 @@
       return urls;
     }
   
-    addSave.addEventListener("click", async () => {
+    addSave?.addEventListener("click", async () => {
       addError.classList.add("hidden");
       addError.textContent = "";
   
@@ -272,7 +269,6 @@
         return;
       }
   
-      // Merge size + note into description (size NOT in DB column)
       let finalDescription = descriptionRaw.trim();
       if (size) finalDescription = `Size: ${size}\n\n${finalDescription}`;
       if (note) finalDescription = `${finalDescription}\n\nNote: ${note}`;
@@ -281,7 +277,6 @@
         addSave.disabled = true;
         addSave.textContent = "Saving...";
   
-        // 1) Create product
         const created = await apiPost("/api/admin/products", {
           name,
           price,
@@ -289,14 +284,12 @@
           category,
           description: finalDescription
         });
-        const productId = created.id;
   
-        // 2) Upload images (optional)
+        const productId = created?.id;
+  
         const files = Array.from(pPhotos.files || []);
         if (files.length > 0) {
           const urls = await uploadFilesToCloudinaryService(files);
-  
-          // Backend Option B (ProductImagesDto { imageUrls: [] })
           await apiPost(`/api/admin/products/${productId}/images`, { imageUrls: urls });
         }
   
@@ -329,7 +322,7 @@
         dateTd.textContent = o.createdAt ? new Date(o.createdAt).toLocaleString() : "—";
   
         const custTd = document.createElement("td");
-        custTd.textContent = `${o.customerName} (${o.contactNumber})`;
+        custTd.textContent = `${o.customerName || ""} (${o.contactNumber || ""})`;
   
         const totalTd = document.createElement("td");
         totalTd.textContent = Number(o.totalAmount || 0).toFixed(2);
@@ -369,14 +362,12 @@
     const contentHome = document.getElementById("content-home");
     const contentAbout = document.getElementById("content-about");
   
-    // Home fields (hero)
     const heroTitle = document.getElementById("home-title");
     const heroSubtitle = document.getElementById("home-subtitle");
     const heroImageUrl = document.getElementById("home-imageUrl");
     const saveHome = document.getElementById("save-home");
     const homeSaveMsg = document.getElementById("home-save-msg");
   
-    // About fields (content)
     const contentText = document.getElementById("about-text");
     const contentImage1Url = document.getElementById("about-imageUrl1");
     const contentImage2Url = document.getElementById("about-imageUrl2");
@@ -407,7 +398,7 @@
   
       contentText.value = about.contentText || "";
       contentImage1Url.value = about.contentImage1Url || "";
-      contentImage2Url.value = about.contentImage1Url || "";
+      contentImage2Url.value = about.contentImage2Url || ""; // ✅ FIX
     }
   
     function showMsg(el, text) {
@@ -416,7 +407,7 @@
       setTimeout(() => el.classList.add("hidden"), 1600);
     }
   
-    saveHome.addEventListener("click", async () => {
+    saveHome?.addEventListener("click", async () => {
       await apiPutJson("/api/admin/content/home", {
         heroTitle: heroTitle.value.trim(),
         heroSubtitle: heroSubtitle.value.trim(),
@@ -425,7 +416,7 @@
       showMsg(homeSaveMsg, "Saved.");
     });
   
-    saveAbout.addEventListener("click", async () => {
+    saveAbout?.addEventListener("click", async () => {
       await apiPutJson("/api/admin/content/about", {
         contentText: contentText.value,
         contentImage1Url: contentImage1Url.value.trim(),
@@ -434,7 +425,6 @@
       showMsg(aboutSaveMsg, "Saved.");
     });
   
-    // ===== Init =====
     async function refreshAll() {
       try {
         await loadProducts();

@@ -1,6 +1,6 @@
 (() => {
     const CONFIG = {
-      API_BASE: "",
+      API_BASE: "http://localhost:5000",
       CART_STORAGE_KEY: "nexora_cart_v1",
       TOKEN_KEY: "nexora_admin_token_v1",
       CURRENCY: "EUR"
@@ -135,18 +135,18 @@
     }
   
     function showModal(el) {
-      el.classList.remove("hidden");
+      el?.classList.remove("hidden");
       document.body.style.overflow = "hidden";
     }
     function hideModal(el) {
-      el.classList.add("hidden");
+      el?.classList.add("hidden");
       document.body.style.overflow = "";
     }
   
     function showPage(name) {
-      Object.values(pages).forEach(p => p.classList.add("hidden"));
-      if (name === "product") pages.product.classList.remove("hidden");
-      else pages[name].classList.remove("hidden");
+      Object.values(pages).forEach(p => p?.classList.add("hidden"));
+      if (name === "product") pages.product?.classList.remove("hidden");
+      else pages[name]?.classList.remove("hidden");
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   
@@ -164,7 +164,6 @@
       }
       showPage(hash);
   
-      // render cart when entering cart page
       if (hash === "cart") renderCart();
     }
   
@@ -193,7 +192,10 @@
   
     function addToCart(product) {
       const existing = cart.find(i => i.productId === product.id);
-      const firstImg = (product.ImageUrls && product.ImageUrls.length) ? product.ImageUrls[0] : "";
+  
+      // ✅ FIX: correct property name is imageUrls (not ImageUrls)
+      const firstImg = (product.imageUrls && product.imageUrls.length) ? product.imageUrls[0] : "";
+  
       if (existing) existing.quantity += 1;
       else {
         cart.push({
@@ -282,7 +284,6 @@
     // ===== CONTENT =====
     async function loadHomeContent() {
       const data = await apiGet("/api/content/home");
-      // ContentDto mapping:
       homeTitleEl.textContent = data.heroTitle || "Nexora";
       homeSubtitleEl.textContent = data.heroSubtitle || "";
       homeImageEl.src = data.heroImageUrl || "";
@@ -290,7 +291,6 @@
   
     async function loadAboutContent() {
       const data = await apiGet("/api/content/about");
-      // ContentDto mapping:
       aboutTextEl.textContent = data.contentText || "";
       aboutImg1El.src = data.contentImage1Url || "";
       aboutImg2El.src = data.contentImage2Url || "";
@@ -353,7 +353,6 @@
       if (!selectedGender) return;
   
       const params = new URLSearchParams();
-      // backend supports gender/category query (ProductsController)
       params.set("gender", selectedGender);
       if (selectedCategory) params.set("category", selectedCategory);
   
@@ -440,7 +439,6 @@
       const res = await apiPost("/api/admin/login", { username, password });
       if (!res || !res.token) throw new Error("Invalid login response");
       localStorage.setItem(CONFIG.TOKEN_KEY, res.token);
-      // your structure: /html/admin.html
       window.location.href = "/html/admin.html";
     }
   
@@ -499,9 +497,11 @@
   
     checkoutCancel?.addEventListener("click", () => hideModal(checkoutModal));
   
+    // ✅ FIX: country input name is "country"
     checkoutForm?.addEventListener("input", (e) => {
-      if (e.target && e.target.name === "Country") {
-        setStateSuggestions(e.target.value);
+      const t = e.target;
+      if (t && t.name === "country") {
+        setStateSuggestions(t.value);
       }
     });
   
@@ -512,19 +512,18 @@
   
       const fd = new FormData(checkoutForm);
   
-      // DTO exact fields (PascalCase matches your C# properties)
+      // ✅ FIX: map from your HTML input names
       const orderDto = {
-        CustomerName: String(fd.get("CustomerName") || "").trim(),
-        CustomerEmail: String(fd.get("CustomerEmail") || "").trim(),
-        ContactNumber: String(fd.get("ContactNumber") || "").trim(),
-        Country: String(fd.get("Country") || "").trim(),
-        StateProvince: String(fd.get("StateProvince") || "").trim(),
-        City: String(fd.get("City") || "").trim(),
-        PostCode: String(fd.get("PostCode") || "").trim(),
-        Notes: String(fd.get("Notes") || "").trim()
+        CustomerName: String(fd.get("fullName") || "").trim(),
+        CustomerEmail: String(fd.get("email") || "").trim(),
+        ContactNumber: String(fd.get("phone") || "").trim(),
+        Country: String(fd.get("country") || "").trim(),
+        StateProvince: String(fd.get("state") || "").trim(),
+        City: String(fd.get("city") || "").trim(),
+        PostCode: String(fd.get("postCode") || "").trim(),
+        Notes: String(fd.get("notes") || "").trim()
       };
   
-      // mandatory validation (Notes optional)
       const required = ["CustomerName", "CustomerEmail", "ContactNumber", "Country", "StateProvince", "City", "PostCode"];
       for (const k of required) {
         if (!orderDto[k]) {
@@ -535,7 +534,6 @@
       }
       if (!orderDto.Notes) orderDto.Notes = null;
   
-      // Items must include ProductName + Price for your DTO
       orderDto.Items = cart.map(i => ({
         ProductId: i.productId,
         ProductName: i.name,

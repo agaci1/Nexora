@@ -4,7 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Nexora Admin</title>
-  <link rel="stylesheet" href="/Users/alkeogaci/Documents/Nexora/NexoraFrontend/css/admin.css" />
+
+  <!-- FIXED: relative path -->
+  <link rel="stylesheet" href="../css/admin.css" />
 </head>
 <body>
   <div class="admin-shell">
@@ -18,7 +20,9 @@
 
       <div class="side-bottom">
         <button id="logout" class="btn btn-danger">Logout</button>
-        <a href="/index.html#home" class="btn btn-secondary">Back to Site</a>
+
+        <!-- FIXED: if your public site is in html/index.html -->
+        <a href="./index.html#home" class="btn btn-secondary">Back to Site</a>
       </div>
     </aside>
 
@@ -184,6 +188,7 @@
     </div>
   </div>
 
-  <script src="/Users/alkeogaci/Documents/Nexora/NexoraFrontend/js/admin.js"></script>
+  <!-- FIXED: relative path -->
+  <script src="../js/admin.js"></script>
 </body>
 </html>
