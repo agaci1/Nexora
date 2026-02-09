@@ -111,6 +111,14 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IContentService, ContentService>();
 
+// ---------- Railway PORT binding (IMPORTANT) ----------
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrWhiteSpace(port))
+{
+    // Force Kestrel to listen on the port Railway assigns
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+}
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
