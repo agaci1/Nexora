@@ -132,7 +132,6 @@ app.UseSwaggerUI(c =>
 
 // Optional: root endpoint so the base URL isn't blank
 app.MapGet("/", () => "Nexora API is running ✅");
-
 app.UseCors("AllowAll");
 
 app.UseAuthentication();

@@ -14,7 +14,4 @@
         WORKDIR /app
         COPY --from=build /app/out .
         
-        # IMPORTANT: listen on Railway's PORT
-        ENV ASPNETCORE_URLS=http://0.0.0.0:${PORT}
-        
         CMD ["dotnet", "Nexora.Api.dll"]
