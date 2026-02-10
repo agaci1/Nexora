@@ -121,11 +121,16 @@ if (!string.IsNullOrWhiteSpace(port))
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+// ✅ Enable Swagger in Production too (Railway runs as Production)
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Nexora API v1");
+    c.RoutePrefix = "swagger";
+});
+
+// Optional: root endpoint so the base URL isn't blank
+app.MapGet("/", () => "Nexora API is running ✅");
 
 app.UseCors("AllowAll");
 
@@ -133,7 +138,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 
 // ---------- Auto-migrate + Seed Admin ----------
 try
@@ -182,7 +186,6 @@ catch (Exception ex)
 }
 
 app.Run();
-
 
 // ================= Helpers =================
 static class ConnectionStringHelper
