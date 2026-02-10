@@ -1,4 +1,0 @@
-window.__ENV__ = {
-    API_BASE: "__API_BASE__",
-    CLOUDINARY_SERVICE_URL: "__CLOUDINARY_SERVICE_URL__"
-  };
