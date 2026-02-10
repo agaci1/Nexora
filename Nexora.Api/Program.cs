@@ -44,7 +44,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// ---------- CORS (dev-friendly; tighten later) ----------
+// ---------- CORS ----------
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -84,7 +84,6 @@ var jwtSecret =
 
 if (string.IsNullOrWhiteSpace(jwtSecret))
 {
-    // Dev-only fallback to avoid crash.
     jwtSecret = "CHANGE_ME_CHANGE_ME_CHANGE_ME_MIN_32_CHARS";
 }
 
@@ -112,17 +111,13 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IContentService, ContentService>();
 
-// ---------- Railway PORT binding (IMPORTANT) ----------
-var port = Environment.GetEnvironmentVariable("PORT");
-if (!string.IsNullOrWhiteSpace(port))
-{
-    // Force Kestrel to listen on the port Railway assigns
-    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
-}
+// ---------- ALWAYS bind to Railway PORT ----------
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
 var app = builder.Build();
 
-// ✅ Enable Swagger in Production too (Railway runs as Production)
+// Swagger also in Production
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
@@ -130,8 +125,6 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = "swagger";
 });
 
-// Optional: root endpoint so the base URL isn't blank
-app.MapGet("/", () => "Nexora API is running ✅");
 app.UseCors("AllowAll");
 
 app.UseAuthentication();
@@ -139,16 +132,18 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+// Health + root (only once)
+app.MapGet("/", () => Results.Ok("Nexora API is running ✅"));
+app.MapHealthChecks("/health");
+
 // ---------- Auto-migrate + Seed Admin ----------
 try
 {
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<NexoraDbContext>();
 
-    // 1) Run migrations
     await db.Database.MigrateAsync();
 
-    // 2) Seed admin from config/env (Railway: Admin__Username / Admin__Password)
     var adminUsername =
         builder.Configuration["Admin:Username"]
         ?? Environment.GetEnvironmentVariable("Admin__Username");
@@ -171,7 +166,6 @@ try
             });
 
             await db.SaveChangesAsync();
-
             app.Logger.LogInformation("Seeded initial admin user: {Username}", adminUsername);
         }
     }
@@ -185,7 +179,6 @@ catch (Exception ex)
     app.Logger.LogError(ex, "Error running migrations/seed");
 }
 
-app.MapHealthChecks("/health");
 app.Run();
 
 // ================= Helpers =================
@@ -193,7 +186,6 @@ static class ConnectionStringHelper
 {
     public static string FromMySqlUrl(string mysqlUrl)
     {
-        // mysql://user:pass@host:port/db
         var uri = new Uri(mysqlUrl);
 
         var userInfo = uri.UserInfo.Split(':', 2);
@@ -204,7 +196,6 @@ static class ConnectionStringHelper
         var port = uri.Port;
         var db = uri.AbsolutePath.Trim('/');
 
-        // Railway often needs SSL; keep Required unless you confirm otherwise.
         return $"Server={host};Port={port};Database={db};User={user};Password={pass};SslMode=Required;";
     }
 }
