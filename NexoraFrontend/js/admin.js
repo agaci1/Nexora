@@ -1,6 +1,6 @@
 (() => {
     const CONFIG = {
-      API_BASE: "https://nexora-production-dd36.up.railway.app",
+      API_BASE: window.__ENV__?.API_BASE || "http://localhost:5000",
       TOKEN_KEY: "nexora_admin_token_v1",
       CATEGORIES: [
         "T-Shirts",
