@@ -10,11 +10,11 @@
     RUN dotnet publish Nexora.Api/Nexora.Api.csproj -c Release -o /app/out
     
     # -------- Run --------
-    FROM mcr.microsoft.com/dotnet/aspnet:8.0
-    WORKDIR /app
-    COPY --from=build /app/out .
-    
-    # Railway provides PORT at runtime
-    ENV ASPNETCORE_URLS=http://0.0.0.0:${PORT}
-    
-    CMD ["dotnet", "Nexora.Api.dll"]
+        FROM mcr.microsoft.com/dotnet/aspnet:8.0
+        WORKDIR /app
+        COPY --from=build /app/out .
+        
+        # IMPORTANT: listen on Railway's PORT
+        ENV ASPNETCORE_URLS=http://0.0.0.0:${PORT}
+        
+        CMD ["dotnet", "Nexora.Api.dll"]

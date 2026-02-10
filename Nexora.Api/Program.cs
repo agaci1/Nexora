@@ -186,7 +186,6 @@ catch (Exception ex)
     app.Logger.LogError(ex, "Error running migrations/seed");
 }
 
-app.MapGet("/", () => Results.Ok("Nexora API is running ✅"));
 app.MapHealthChecks("/health");
 app.Run();
 
