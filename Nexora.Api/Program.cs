@@ -58,8 +58,11 @@ var conn =
     builder.Configuration.GetConnectionString("DefaultConnection")
     ?? Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
     ?? Environment.GetEnvironmentVariable("MYSQL_URL")
-    ?? Environment.GetEnvironmentVariable("MYSQL_PUBLIC_URL");
+    ?? Environment.GetEnvironmentVariable("MYSQL_PUBLIC_URL")
+    ?? Environment.GetEnvironmentVariable("DATABASE_URL");
 
+// If Railway gives us a URL-style connection string (mysql://user:pass@host:port/db),
+// convert it to the ADO.NET format expected by Pomelo.
 if (!string.IsNullOrWhiteSpace(conn) &&
     conn.StartsWith("mysql://", StringComparison.OrdinalIgnoreCase))
 {
@@ -70,7 +73,7 @@ if (string.IsNullOrWhiteSpace(conn))
 {
     throw new Exception(
         "Database connection string not found. " +
-        "Set ConnectionStrings:DefaultConnection, or env var ConnectionStrings__DefaultConnection / MYSQL_URL / MYSQL_PUBLIC_URL.");
+        "Set ConnectionStrings:DefaultConnection, or env var ConnectionStrings__DefaultConnection / MYSQL_URL / MYSQL_PUBLIC_URL / DATABASE_URL.");
 }
 
 builder.Services.AddDbContext<NexoraDbContext>(opt =>
