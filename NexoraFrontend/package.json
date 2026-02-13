@@ -2,7 +2,7 @@
     "name": "nexora-frontend",
     "private": true,
     "scripts": {
-      "start": "npm start"
+      "start": "serve -s html -l $PORT"
     },
     "dependencies": {
       "serve": "^14.2.0"
